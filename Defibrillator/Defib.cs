@@ -30,10 +30,10 @@ namespace Defib
 		{
 			Player player = new SmodPlayer(base.PlayerObject);
 			GameObject ply = (GameObject)player.GetGameObject();
+			int limit = 0;
 
-			foreach (Ragdoll ragdoll in DefibPlugin.ragdolls.Where(rg => rg.transform.position.x <= ply.transform.position.x + 5f || rg.transform.position.z <= ply.transform.position.z + 5f))
+			foreach (Ragdoll ragdoll in DefibPlugin.ragdolls.Where(rg => rg.transform.position.x <= ply.transform.position.x + 5f || rg.transform.position.z <= ply.transform.position.z + 2.5f))
 			{
-				int limit = 0;
 				if (limit > 0) break;
 
 				if (FriendlyRoles((int)player.TeamRole.Role).Contains(ragdoll.owner.charclass))
@@ -44,14 +44,42 @@ namespace Defib
 						{
 							Delete();
 
+							switch (ragdoll.owner.charclass)
+							{
+								case 1:
+									DefibPlugin.TargetRole = Role.CLASSD;
+									break;
+								case 4:
+									DefibPlugin.TargetRole = Role.NTF_SCIENTIST;
+									break;
+								case 6:
+									DefibPlugin.TargetRole = Role.SCIENTIST;
+									break;
+								case 8:
+									DefibPlugin.TargetRole = Role.CHAOS_INSURGENCY;
+									break;
+								case 11:
+									DefibPlugin.TargetRole = Role.NTF_LIEUTENANT;
+									break;
+								case 12:
+									DefibPlugin.TargetRole = Role.NTF_COMMANDER;
+									break;
+								case 13:
+									DefibPlugin.TargetRole = Role.NTF_CADET;
+									break;
+								case 15:
+									DefibPlugin.TargetRole = Role.FACILITY_GUARD;
+									break;
+							}
+
 							if (DefibPlugin.Delay > 0)
-								Timing.RunCoroutine(_Delay(() => target.ChangeRole(player.TeamRole.Role, false, false, false, false), DefibPlugin.Delay));
+								Timing.RunCoroutine(_Delay(() => target.ChangeRole(DefibPlugin.TargetRole, false, false, false, false), DefibPlugin.Delay));
 							else
-								target.ChangeRole(player.TeamRole.Role, false, false, false, false);
+								target.ChangeRole(DefibPlugin.TargetRole, false, false, false, false);
 
 							Timing.RunCoroutine(_Delay(() => target.SetHealth(Mathf.RoundToInt(target.GetHealth() * DefibPlugin.ReviveHealth)), 2f));
 							limit++;
-							RagdollManager.Destroy(ragdoll, 0f);
+							NetworkServer.Destroy(ragdoll.gameObject);
 						}
 					}
 				}

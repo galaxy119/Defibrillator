@@ -31,8 +31,12 @@ namespace Defib
 
 		public static Ragdoll[] ragdolls;
 
+		public static Role TargetRole { get; internal set; }
+
 		public static float ReviveHealth { get; private set; }
 		public static float Delay { get; private set; }
+
+		public bool GuardSpawn { get; private set; }
 
 		public static List<string> SpawnLocations;
 
@@ -52,6 +56,7 @@ namespace Defib
 			this.AddConfig(new ConfigSetting("defib_delay", 5, true, "The number of seconds before a Defib revives a player."));
 			this.AddConfig(new ConfigSetting("defib_spawns", new string[] { "049chamber" }, true, true, "Locations the Defib can spawn in."));
 			this.AddConfig(new ConfigSetting("defib_enabled", true, true, "If the defib item should be enabled."));
+			this.AddConfig(new ConfigSetting("defib_guards", true, true, "If guards should spawn with Defibs."));
 
 			this.AddEventHandlers(new EventHandler(this), Smod2.Events.Priority.Low);
 
@@ -69,6 +74,7 @@ namespace Defib
 			ReviveHealth = GetConfigFloat("defib_health");
 			Delay = GetConfigFloat("defib_delay");
 			SpawnLocations = new List<string>(GetConfigList("defib_spawns"));
+			GuardSpawn = GetConfigBool("defib_guards");
 		}
 	}
 }

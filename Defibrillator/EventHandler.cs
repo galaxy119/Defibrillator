@@ -15,7 +15,7 @@ using System.Collections.Generic;
 
 namespace Defib
 {
-	public class EventHandler : IEventHandlerPlayerDie, IEventHandlerRoundStart, IEventHandlerWaitingForPlayers
+	public class EventHandler : IEventHandlerPlayerDie, IEventHandlerRoundStart, IEventHandlerWaitingForPlayers, IEventHandlerSpawn
 	{
 		private readonly DefibPlugin plugin;
 		public EventHandler(DefibPlugin plugin) => this.plugin = plugin;
@@ -82,6 +82,16 @@ namespace Defib
 			}
 		}
 
+		public void OnSpawn(PlayerSpawnEvent ev)
+		{
+			if (!plugin.GuardSpawn) return;
+
+			if (ev.Player.TeamRole.Role == Role.FACILITY_GUARD)
+			{
+				Timing.RunCoroutine(GiveDefib(ev.Player));
+			}
+		}
+
 		public void OnPlayerDie(PlayerDeathEvent ev)
 		{
 			Timing.RunCoroutine(_RunAfter(() => DefibPlugin.ragdolls = GameObject.FindObjectsOfType<Ragdoll>()));
@@ -91,6 +101,15 @@ namespace Defib
 		{
 			yield return Timing.WaitForOneFrame;
 			action();
+		}
+
+		public IEnumerator<float> GiveDefib(Player player)
+		{
+			yield return 1f;
+
+			GameObject ply = (GameObject)player.GetGameObject();
+
+			Items.Handlers[106].Create(ply.GetComponent<Inventory>());
 		}
 
 		public struct SpawnLocation
